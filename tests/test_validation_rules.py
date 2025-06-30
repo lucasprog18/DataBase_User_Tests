@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import pytest
+import re
 from utils.db_connection import execute_query, fetch_one
 
 def setup_function():
@@ -64,6 +65,17 @@ def test_user_count_after_multiple_inserts():
 
     count = fetch_one("SELECT COUNT(*) as total FROM users;")["total"]
     assert count == 3
+
+# --- Format validation (not enforced by SQLite) ---
+
+def test_invalid_email_format_should_fail_on_client_side():
+    """
+    Simulates client-side or service-layer format validation.
+    This email should fail the basic regex check.
+    """
+    email = "invalid-email"
+    assert not re.match(r"[^@]+@[^@]+\.[^@]+", email)
+
 
 
 
